@@ -109,7 +109,7 @@ TEST_F_TEARDOWN(adding_items)
 	tau->dq = dq_del(tau->dq, NULL);
 }
 
-TEST(adding_items, pshtail_null_q_returns_null)
+TEST(adding_items, pushtail_null_q_returns_null)
 {
 	CHECK(dq_push_tail(NULL, NULL, NULL) == NULL);
 	CHECK(dq_push_tail(NULL, n1d, NULL) == NULL);
@@ -121,7 +121,7 @@ TEST(adding_items, pshtail_null_q_returns_null)
 	);
 }
 
-TEST(adding_items, pshhead_null_q_returns_null)
+TEST(adding_items, pushhead_null_q_returns_null)
 {
 	CHECK(dq_push_head(NULL, NULL, NULL) == NULL);
 	CHECK(dq_push_head(NULL, n1d, NULL) == NULL);
@@ -133,7 +133,7 @@ TEST(adding_items, pshhead_null_q_returns_null)
 	);
 }
 
-TEST_F(adding_items, pshtail_q_null_null_adds_node_with_NULL_data)
+TEST_F(adding_items, pushtail_q_null_null_adds_node_with_NULL_data)
 {
 	tau->n1 = dq_push_tail(tau->dq, NULL, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
@@ -143,7 +143,7 @@ TEST_F(adding_items, pshtail_q_null_null_adds_node_with_NULL_data)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), NULL);
 }
 
-TEST_F(adding_items, pshhead_q_null_null_adds_node_with_NULL_data)
+TEST_F(adding_items, pushhead_q_null_null_adds_node_with_NULL_data)
 {
 	tau->n1 = dq_push_head(tau->dq, NULL, NULL);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
@@ -153,7 +153,7 @@ TEST_F(adding_items, pshhead_q_null_null_adds_node_with_NULL_data)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), NULL);
 }
 
-TEST_F(adding_items, pshtail_q_d_f_adds_node_with_duplicated_data)
+TEST_F(adding_items, pushtail_q_d_f_adds_node_with_duplicated_data)
 {
 	tau->n1 = dq_push_tail(tau->dq, n1d, dup_str);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
@@ -165,7 +165,7 @@ TEST_F(adding_items, pshtail_q_d_f_adds_node_with_duplicated_data)
 	free(node_set_data(tau->dq->head, NULL));
 }
 
-TEST_F(adding_items, pshhead_q_d_f_adds_node_with_duplicated_data)
+TEST_F(adding_items, pushhead_q_d_f_adds_node_with_duplicated_data)
 {
 	tau->n1 = dq_push_head(tau->dq, n1d, dup_str);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
@@ -177,7 +177,7 @@ TEST_F(adding_items, pshhead_q_d_f_adds_node_with_duplicated_data)
 	free(node_set_data(tau->dq->head, NULL));
 }
 
-TEST_F(adding_items, pshtail_3_nodes)
+TEST_F(adding_items, pushtail_3_nodes)
 {
 	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
@@ -201,7 +201,7 @@ TEST_F(adding_items, pshtail_3_nodes)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
-TEST_F(adding_items, pshhead_3_nodes)
+TEST_F(adding_items, pushhead_3_nodes)
 {
 	tau->n1 = dq_push_head(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
@@ -225,7 +225,7 @@ TEST_F(adding_items, pshhead_3_nodes)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
-TEST_F(adding_items, pshtail_q_d_failfunc_returns_NULL)
+TEST_F(adding_items, pushtail_q_d_failfunc_returns_NULL)
 {
 	tau->n1 = dq_push_tail(tau->dq, n1d, fail_dup);
 
@@ -234,7 +234,7 @@ TEST_F(adding_items, pshtail_q_d_failfunc_returns_NULL)
 	CHECK_PTR_EQ(tau->dq->tail, NULL);
 }
 
-TEST_F(adding_items, pshhead_q_d_failfunc_returns_NULL)
+TEST_F(adding_items, pushhead_q_d_failfunc_returns_NULL)
 {
 	tau->n1 = dq_push_head(tau->dq, n1d, fail_dup);
 
@@ -243,7 +243,7 @@ TEST_F(adding_items, pshhead_q_d_failfunc_returns_NULL)
 	CHECK_PTR_EQ(tau->dq->tail, NULL);
 }
 
-TEST_F(adding_items, pshtail_2_nodes_fail_on_2nd)
+TEST_F(adding_items, pushtail_2_nodes_fail_on_2nd)
 {
 	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
@@ -255,7 +255,7 @@ TEST_F(adding_items, pshtail_2_nodes_fail_on_2nd)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
-TEST_F(adding_items, pshhead_2_nodes_fail_on_2nd)
+TEST_F(adding_items, pushhead_2_nodes_fail_on_2nd)
 {
 	tau->n1 = dq_push_head(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
@@ -267,7 +267,7 @@ TEST_F(adding_items, pshhead_2_nodes_fail_on_2nd)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
-TEST_F(adding_items, pshhead_pshtail_pshtail)
+TEST_F(adding_items, pushhead_pushtail_pushtail)
 {
 	tau->n1 = dq_push_head(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
@@ -286,7 +286,7 @@ TEST_F(adding_items, pshhead_pshtail_pshtail)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
-TEST_F(adding_items, pshhead_pshtail_pshhead)
+TEST_F(adding_items, pushhead_pushtail_pushhead)
 {
 	tau->n1 = dq_push_head(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
@@ -300,7 +300,7 @@ TEST_F(adding_items, pshhead_pshtail_pshhead)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
-TEST_F(adding_items, pshhead_pshhead_pshtail)
+TEST_F(adding_items, pushhead_pushhead_pushtail)
 {
 	tau->n1 = dq_push_head(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
@@ -314,7 +314,7 @@ TEST_F(adding_items, pshhead_pshhead_pshtail)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
-TEST_F(adding_items, pshtail_pshhead_pshtail)
+TEST_F(adding_items, pushtail_pushhead_pushtail)
 {
 	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
@@ -333,7 +333,7 @@ TEST_F(adding_items, pshtail_pshhead_pshtail)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
-TEST_F(adding_items, pshtail_pshhead_pshhead)
+TEST_F(adding_items, pushtail_pushhead_pushhead)
 {
 	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
@@ -347,7 +347,7 @@ TEST_F(adding_items, pshtail_pshhead_pshhead)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
-TEST_F(adding_items, pshtail_pshtail_pshhead)
+TEST_F(adding_items, pushtail_pushtail_pushhead)
 {
 	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
@@ -444,16 +444,16 @@ TEST_F(removing_items, poptail_1_node_from_3)
 }
 
 /* ###################################################################### */
-/* ##################### add_and_remove_pshtail ######################### */
+/* ##################### add_and_remove_pushtail ######################### */
 /* ###################################################################### */
 
-struct add_and_remove_pshtail
+struct add_and_remove_pushtail
 {
 	linked_node *n1, *n2, *n3, *n4;
 	deque *dq;
 };
 
-TEST_F_SETUP(add_and_remove_pshtail)
+TEST_F_SETUP(add_and_remove_pushtail)
 {
 	tau->dq = dq_new();
 	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
@@ -472,7 +472,7 @@ TEST_F_SETUP(add_and_remove_pshtail)
 	REQUIRE(tau->n2, "push_tail() returns non-null");
 }
 
-TEST_F_TEARDOWN(add_and_remove_pshtail)
+TEST_F_TEARDOWN(add_and_remove_pushtail)
 {
 	tau->n1 = node_del(tau->n1);
 	tau->n2 = node_del(tau->n2);
@@ -483,7 +483,7 @@ TEST_F_TEARDOWN(add_and_remove_pshtail)
 	tau->dq = dq_del(tau->dq, NULL);
 }
 
-TEST_F(add_and_remove_pshtail, pshtail_poptail)
+TEST_F(add_and_remove_pushtail, pushtail_poptail)
 {
 	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3);
@@ -495,7 +495,7 @@ TEST_F(add_and_remove_pshtail, pshtail_poptail)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
-TEST_F(add_and_remove_pshtail, pshtail_pophead)
+TEST_F(add_and_remove_pushtail, pushtail_pophead)
 {
 	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3);
@@ -507,7 +507,7 @@ TEST_F(add_and_remove_pshtail, pshtail_pophead)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
-TEST_F(add_and_remove_pshtail, pshhead_pophead)
+TEST_F(add_and_remove_pushtail, pushhead_pophead)
 {
 	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3);
@@ -519,7 +519,7 @@ TEST_F(add_and_remove_pshtail, pshhead_pophead)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
-TEST_F(add_and_remove_pshtail, pshhead_poptail)
+TEST_F(add_and_remove_pushtail, pushhead_poptail)
 {
 	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3);
@@ -531,7 +531,7 @@ TEST_F(add_and_remove_pshtail, pshhead_poptail)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
-TEST_F(add_and_remove_pshtail, poptail_pushtail)
+TEST_F(add_and_remove_pushtail, poptail_pushtail)
 {
 	CHECK(dq_pop_tail(tau->dq) == n2d);
 	tau->n2 = NULL;
@@ -543,7 +543,7 @@ TEST_F(add_and_remove_pshtail, poptail_pushtail)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
-TEST_F(add_and_remove_pshtail, poptail_pushhead)
+TEST_F(add_and_remove_pushtail, poptail_pushhead)
 {
 	CHECK(dq_pop_tail(tau->dq) == n2d);
 	tau->n2 = NULL;
@@ -555,7 +555,7 @@ TEST_F(add_and_remove_pshtail, poptail_pushhead)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
-TEST_F(add_and_remove_pshtail, pophead_pushhead)
+TEST_F(add_and_remove_pushtail, pophead_pushhead)
 {
 	CHECK(dq_pop_head(tau->dq) == n1d);
 	tau->n1 = NULL;
@@ -567,7 +567,7 @@ TEST_F(add_and_remove_pshtail, pophead_pushhead)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
-TEST_F(add_and_remove_pshtail, pophead_pushtail)
+TEST_F(add_and_remove_pushtail, pophead_pushtail)
 {
 	CHECK(dq_pop_head(tau->dq) == n1d);
 	tau->n1 = NULL;
@@ -580,16 +580,16 @@ TEST_F(add_and_remove_pshtail, pophead_pushtail)
 }
 
 /* ###################################################################### */
-/* ###################### add_and_remove_pshhead ######################## */
+/* ###################### add_and_remove_pushhead ######################## */
 /* ###################################################################### */
 
-struct add_and_remove_pshhead
+struct add_and_remove_pushhead
 {
 	linked_node *n1, *n2, *n3, *n4;
 	deque *dq;
 };
 
-TEST_F_SETUP(add_and_remove_pshhead)
+TEST_F_SETUP(add_and_remove_pushhead)
 {
 	tau->dq = dq_new();
 	tau->n2 = dq_push_head(tau->dq, n2d, NULL);
@@ -608,7 +608,7 @@ TEST_F_SETUP(add_and_remove_pshhead)
 	REQUIRE(tau->n1, "push_head() returns non-null");
 }
 
-TEST_F_TEARDOWN(add_and_remove_pshhead)
+TEST_F_TEARDOWN(add_and_remove_pushhead)
 {
 	tau->n1 = node_del(tau->n1);
 	tau->n2 = node_del(tau->n2);
@@ -619,7 +619,7 @@ TEST_F_TEARDOWN(add_and_remove_pshhead)
 	tau->dq = dq_del(tau->dq, NULL);
 }
 
-TEST_F(add_and_remove_pshhead, pshtail_poptail)
+TEST_F(add_and_remove_pushhead, pushtail_poptail)
 {
 	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3);
@@ -631,7 +631,7 @@ TEST_F(add_and_remove_pshhead, pshtail_poptail)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
-TEST_F(add_and_remove_pshhead, pshtail_pophead)
+TEST_F(add_and_remove_pushhead, pushtail_pophead)
 {
 	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3);
@@ -643,7 +643,7 @@ TEST_F(add_and_remove_pshhead, pshtail_pophead)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
-TEST_F(add_and_remove_pshhead, pshhead_pophead)
+TEST_F(add_and_remove_pushhead, pushhead_pophead)
 {
 	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3);
@@ -655,7 +655,7 @@ TEST_F(add_and_remove_pshhead, pshhead_pophead)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
-TEST_F(add_and_remove_pshhead, pshhead_poptail)
+TEST_F(add_and_remove_pushhead, pushhead_poptail)
 {
 	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3);
@@ -667,7 +667,7 @@ TEST_F(add_and_remove_pshhead, pshhead_poptail)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
-TEST_F(add_and_remove_pshhead, poptail_pushtail)
+TEST_F(add_and_remove_pushhead, poptail_pushtail)
 {
 	CHECK(dq_pop_tail(tau->dq) == n2d);
 	tau->n2 = NULL;
@@ -679,7 +679,7 @@ TEST_F(add_and_remove_pshhead, poptail_pushtail)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
-TEST_F(add_and_remove_pshhead, poptail_pushhead)
+TEST_F(add_and_remove_pushhead, poptail_pushhead)
 {
 	CHECK(dq_pop_tail(tau->dq) == n2d);
 	tau->n2 = NULL;
@@ -691,7 +691,7 @@ TEST_F(add_and_remove_pshhead, poptail_pushhead)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
-TEST_F(add_and_remove_pshhead, pophead_pushhead)
+TEST_F(add_and_remove_pushhead, pophead_pushhead)
 {
 	CHECK(dq_pop_head(tau->dq) == n1d);
 	tau->n1 = NULL;
@@ -703,7 +703,7 @@ TEST_F(add_and_remove_pshhead, pophead_pushhead)
 	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
-TEST_F(add_and_remove_pshhead, pophead_pushtail)
+TEST_F(add_and_remove_pushhead, pophead_pushtail)
 {
 	CHECK(dq_pop_head(tau->dq) == n1d);
 	tau->n1 = NULL;
@@ -728,10 +728,15 @@ TEST(deleting_deque, delete_should_clear_all_items)
 
 	if (!dq || !n1 || !n2 || !n3)
 	{
-		free(n1);
-		free(n2);
-		free(n3);
-		free(dq);
+		node_del(n1);
+		n1 = NULL;
+		node_del(n2);
+		n2 = NULL;
+		node_del(n3);
+		n3 = NULL;
+		dq->head = NULL;
+		dq->tail = NULL;
+		dq = dq_del(dq, NULL);
 	}
 
 	REQUIRE((dq && n1 && n2 && n3));
@@ -748,13 +753,15 @@ TEST(deleting_deque, delete_f_should_clear_all_items)
 
 	if (!dq || !n1 || !n2 || !n3)
 	{
-		free(dq->head);
-		free(n1);
-		/* WARNING: data in n2 might not be freed. */
-		free(n2);
-		free(dq->tail);
-		free(n3);
-		free(dq);
+		free(node_del(n1));
+		n1 = NULL;
+		free(node_del(n2));
+		n2 = NULL;
+		free(node_del(n3));
+		n3 = NULL;
+		dq->head = NULL;
+		dq->tail = NULL;
+		dq = dq_del(dq, NULL);
 	}
 
 	REQUIRE((dq && n1 && n2 && n3));
