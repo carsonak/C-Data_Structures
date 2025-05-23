@@ -6,9 +6,12 @@
 
 #include "typedefs.h"
 
-void *delete_2D_array(void **array, size_t size, delete_func *free_row);
+void *delete_2D_array(
+	void **const restrict array, const size_t size, free_func *free_row
+);
 void **dup_2D_array(
-	void **const array, const intmax_t size,
-	dup_func *copy_data, delete_func *free_data);
+	void **const restrict array, const intmax_t size, dup_func *copy_data,
+	free_func *free_data
+);
 
 #endif /* MATRIX_H */

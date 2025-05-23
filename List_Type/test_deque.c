@@ -1,4 +1,5 @@
 #include "deque.h"
+#include "linked_node.h"
 #include "tau/tau.h"
 #include <stdlib.h> /* free */
 
@@ -72,685 +73,696 @@ TAU_MAIN()
 
 TEST(deque_creation, new_returns_empty_q)
 {
-	deque *const q = dq_new();
+	deque *const dq = dq_new();
 
-	REQUIRE(q, "dq_new() returns non-null");
-	CHECK(dq_len(q) == 0, "length should be 0");
-	CHECK(dq_peek_head(q) == NULL, "head of the deque should be empty");
-	CHECK(dq_peek_tail(q) == NULL, "tail of the deque should be empty");
-	free(q);
+	REQUIRE(dq, "dq_new() returns non-null");
+	CHECK(dq->len == 0);
+	CHECK(dq->head == NULL);
+	CHECK(dq->tail == NULL);
+	free(dq);
 }
 
-/*######################################################################*/
-/*######################################################################*/
+/* ###################################################################### */
+/* ###################################################################### */
 
 struct adding_items
 {
-	double_link_node *n1, *n2, *n3;
-	deque *q;
+	linked_node *n1, *n2, *n3;
+	deque *dq;
 };
 
 TEST_F_SETUP(adding_items)
 {
-	tau->q = dq_new();
-	REQUIRE(tau->q, "dq_new() returns non-null");
+	tau->dq = dq_new();
+	REQUIRE(tau->dq, "dq_new() returns non-null");
 }
 
 TEST_F_TEARDOWN(adding_items)
 {
-	free(tau->q);
-	free(tau->n1);
-	free(tau->n2);
-	free(tau->n3);
+	tau->n1 = node_del(tau->n1);
+	tau->n2 = node_del(tau->n2);
+	tau->n3 = node_del(tau->n3);
+	tau->dq->head = NULL;
+	tau->dq->tail = NULL;
+	tau->dq = dq_del(tau->dq, NULL);
 }
 
 TEST(adding_items, pshtail_null_q_returns_null)
 {
-	CHECK(dq_push_tail(NULL, NULL, NULL) == NULL, "pointer to deque required");
-	CHECK(dq_push_tail(NULL, n1d, NULL) == NULL, "pointer to deque required");
+	CHECK(dq_push_tail(NULL, NULL, NULL) == NULL);
+	CHECK(dq_push_tail(NULL, n1d, NULL) == NULL);
 	CHECK(
-		dq_push_tail(NULL, NULL, dup_str) == NULL, "pointer to deque required"
+		dq_push_tail(NULL, NULL, dup_str) == NULL
 	);
 	CHECK(
-		dq_push_tail(NULL, n1d, dup_str) == NULL, "pointer to deque required"
+		dq_push_tail(NULL, n1d, dup_str) == NULL
 	);
 }
 
 TEST(adding_items, pshhead_null_q_returns_null)
 {
-	CHECK(dq_push_head(NULL, NULL, NULL) == NULL, "pointer to deque required");
-	CHECK(dq_push_head(NULL, n1d, NULL) == NULL, "pointer to deque required");
+	CHECK(dq_push_head(NULL, NULL, NULL) == NULL);
+	CHECK(dq_push_head(NULL, n1d, NULL) == NULL);
 	CHECK(
-		dq_push_head(NULL, NULL, dup_str) == NULL, "pointer to deque required"
+		dq_push_head(NULL, NULL, dup_str) == NULL
 	);
 	CHECK(
-		dq_push_head(NULL, n1d, dup_str) == NULL, "pointer to deque required"
+		dq_push_head(NULL, n1d, dup_str) == NULL
 	);
 }
 
 TEST_F(adding_items, pshtail_q_null_null_adds_node_with_NULL_data)
 {
-	tau->n1 = dq_push_tail(tau->q, NULL, NULL);
+	tau->n1 = dq_push_tail(tau->dq, NULL, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 1, "there should only be 1 item in the deque");
-	CHECK(dq_peek_head(tau->q) == NULL, "head should point to the added node");
-	CHECK(dq_peek_tail(tau->q) == NULL, "tail should point to the added node");
+	CHECK(tau->dq->len == 1);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), NULL);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), NULL);
 }
 
 TEST_F(adding_items, pshhead_q_null_null_adds_node_with_NULL_data)
 {
-	tau->n1 = dq_push_head(tau->q, NULL, NULL);
+	tau->n1 = dq_push_head(tau->dq, NULL, NULL);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 1, "there should only be 1 item in the deque");
-	CHECK(dq_peek_head(tau->q) == NULL, "head should point to the added node");
-	CHECK(dq_peek_tail(tau->q) == NULL, "tail should point to the added node");
+	CHECK(tau->dq->len == 1);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), NULL);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), NULL);
 }
 
 TEST_F(adding_items, pshtail_q_d_f_adds_node_with_duplicated_data)
 {
-	tau->n1 = dq_push_tail(tau->q, n1d, dup_str);
+	tau->n1 = dq_push_tail(tau->dq, n1d, dup_str);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 1, "there should only be 1 item in the deque");
-	CHECK_STREQ((char *)dq_peek_head(tau->q), n1d, "head should be n1");
-	CHECK_STREQ((char *)dq_peek_tail(tau->q), n1d, "tail should be n2");
+	CHECK(tau->dq->len == 1);
+	CHECK_STREQ((char *)node_get_data(tau->dq->head), n1d);
+	CHECK_STREQ((char *)node_get_data(tau->dq->tail), n1d);
 
-	free(dq_peek_head(tau->q));
+	free(node_set_data(tau->dq->head, NULL));
 }
 
 TEST_F(adding_items, pshhead_q_d_f_adds_node_with_duplicated_data)
 {
-	tau->n1 = dq_push_head(tau->q, n1d, dup_str);
+	tau->n1 = dq_push_head(tau->dq, n1d, dup_str);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 1, "there should only be 1 item in the deque");
-	CHECK_STREQ((char *)dq_peek_head(tau->q), n1d, "head should be n1");
-	CHECK_STREQ((char *)dq_peek_tail(tau->q), n1d, "tail should be n2");
+	CHECK(tau->dq->len == 1);
+	CHECK_STREQ((char *)node_get_data(tau->dq->head), n1d);
+	CHECK_STREQ((char *)node_get_data(tau->dq->tail), n1d);
 
-	free(dq_peek_head(tau->q));
+	free(node_set_data(tau->dq->head, NULL));
 }
 
 TEST_F(adding_items, pshtail_3_nodes)
 {
-	tau->n1 = dq_push_tail(tau->q, n1d, NULL);
+	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 1, "there should only be 1 item in the deque");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should point to the added node");
-	CHECK(dq_peek_tail(tau->q) == n1d, "tail should point to the added node");
+	CHECK(tau->dq->len == 1);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 
-	tau->n2 = dq_push_tail(tau->q, n2d, NULL);
+	tau->n2 = dq_push_tail(tau->dq, n2d, NULL);
 	REQUIRE(tau->n2 != NULL, "push_tail() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 2, "there should only be 2 items in the deque");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be n1");
-	CHECK(dq_peek_tail(tau->q) == n2d, "tail should be n2");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 
-	tau->n3 = dq_push_tail(tau->q, n3d, NULL);
+	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3 != NULL, "push_tail() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 3, "there should only be 3 items in the deque");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be n1");
-	CHECK(dq_peek_tail(tau->q) == n3d, "tail should be n3");
+	CHECK(tau->dq->len == 3);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(adding_items, pshhead_3_nodes)
 {
-	tau->n1 = dq_push_head(tau->q, n1d, NULL);
+	tau->n1 = dq_push_head(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 1, "there should only be 1 item in the deque");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should point to the added node");
-	CHECK(dq_peek_tail(tau->q) == n1d, "tail should point to the added node");
+	CHECK(tau->dq->len == 1);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 
-	tau->n2 = dq_push_head(tau->q, n2d, NULL);
+	tau->n2 = dq_push_head(tau->dq, n2d, NULL);
 	REQUIRE(tau->n2 != NULL, "push_head() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 2, "there should only be 2 items in the deque");
-	CHECK(dq_peek_head(tau->q) == n2d, "head should be n2");
-	CHECK(dq_peek_tail(tau->q) == n1d, "tail should be n1");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 
-	tau->n3 = dq_push_head(tau->q, n3d, NULL);
+	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3 != NULL, "push_head() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 3, "there should only be 3 items in the deque");
-	CHECK(dq_peek_head(tau->q) == n3d, "head should be n3");
-	CHECK(dq_peek_tail(tau->q) == n1d, "tail should be n1");
+	CHECK(tau->dq->len == 3);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(adding_items, pshtail_q_d_failfunc_returns_NULL)
 {
-	tau->n1 = dq_push_tail(tau->q, n1d, fail_dup);
+	tau->n1 = dq_push_tail(tau->dq, n1d, fail_dup);
 
 	CHECK(tau->n1 == NULL, "push_tail() should return NULL on failure");
-	CHECK(dq_peek_head(tau->q) == NULL, "head should be unchanged");
-	CHECK(dq_peek_tail(tau->q) == NULL, "tail should be unchanged");
+	CHECK_PTR_EQ(tau->dq->head, NULL);
+	CHECK_PTR_EQ(tau->dq->tail, NULL);
 }
 
 TEST_F(adding_items, pshhead_q_d_failfunc_returns_NULL)
 {
-	tau->n1 = dq_push_head(tau->q, n1d, fail_dup);
+	tau->n1 = dq_push_head(tau->dq, n1d, fail_dup);
 
 	CHECK(tau->n1 == NULL, "push_head() should return NULL on failure");
-	CHECK(dq_peek_head(tau->q) == NULL, "head should be unchanged");
-	CHECK(dq_peek_tail(tau->q) == NULL, "tail should be unchanged");
+	CHECK_PTR_EQ(tau->dq->head, NULL);
+	CHECK_PTR_EQ(tau->dq->tail, NULL);
 }
 
 TEST_F(adding_items, pshtail_2_nodes_fail_on_2nd)
 {
-	tau->n1 = dq_push_tail(tau->q, n1d, NULL);
+	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
-	tau->n2 = dq_push_tail(tau->q, n2d, fail_dup);
+	tau->n2 = dq_push_tail(tau->dq, n2d, fail_dup);
 
 	CHECK(tau->n2 == NULL, "push_tail() should return NULL on failure");
-	CHECK(dq_len(tau->q) == 1, "there should only be 1 item in the deque");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be unchanged");
-	CHECK(dq_peek_tail(tau->q) == n1d, "tail should be unchanged");
+	CHECK(tau->dq->len == 1);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(adding_items, pshhead_2_nodes_fail_on_2nd)
 {
-	tau->n1 = dq_push_head(tau->q, n1d, NULL);
+	tau->n1 = dq_push_head(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
-	tau->n2 = dq_push_head(tau->q, n2d, fail_dup);
+	tau->n2 = dq_push_head(tau->dq, n2d, fail_dup);
 
 	CHECK(tau->n2 == NULL, "push_head() should return NULL on failure");
-	CHECK(dq_len(tau->q) == 1, "there should only be 1 item in the deque");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be unchanged");
-	CHECK(dq_peek_tail(tau->q) == n1d, "tail should be unchanged");
+	CHECK(tau->dq->len == 1);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(adding_items, pshhead_pshtail_pshtail)
 {
-	tau->n1 = dq_push_head(tau->q, n1d, NULL);
+	tau->n1 = dq_push_head(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
-	tau->n2 = dq_push_tail(tau->q, n2d, NULL);
+	tau->n2 = dq_push_tail(tau->dq, n2d, NULL);
 	REQUIRE(tau->n2 != NULL, "push_tail() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 2, "there should only be 2 items in the deque");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be n1");
-	CHECK(dq_peek_tail(tau->q) == n2d, "tail should be n2");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 
-	tau->n3 = dq_push_tail(tau->q, n3d, NULL);
+	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3 != NULL, "push_tail() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 3, "there should only be 3 items in the deque");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be n1");
-	CHECK(dq_peek_tail(tau->q) == n3d, "tail should be n3");
+	CHECK(tau->dq->len == 3);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(adding_items, pshhead_pshtail_pshhead)
 {
-	tau->n1 = dq_push_head(tau->q, n1d, NULL);
+	tau->n1 = dq_push_head(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
-	tau->n2 = dq_push_tail(tau->q, n2d, NULL);
+	tau->n2 = dq_push_tail(tau->dq, n2d, NULL);
 	REQUIRE(tau->n2 != NULL, "push_tail() should return non-null pointer");
-	tau->n3 = dq_push_head(tau->q, n3d, NULL);
+	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3 != NULL, "push_head() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 3, "there should only be 3 items in the deque");
-	CHECK(dq_peek_head(tau->q) == n3d, "head should be n3");
-	CHECK(dq_peek_tail(tau->q) == n2d, "tail should be n2");
+	CHECK(tau->dq->len == 3);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(adding_items, pshhead_pshhead_pshtail)
 {
-	tau->n1 = dq_push_head(tau->q, n1d, NULL);
+	tau->n1 = dq_push_head(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
-	tau->n2 = dq_push_head(tau->q, n2d, NULL);
+	tau->n2 = dq_push_head(tau->dq, n2d, NULL);
 	REQUIRE(tau->n2 != NULL, "push_head() should return non-null pointer");
-	tau->n3 = dq_push_tail(tau->q, n3d, NULL);
+	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3 != NULL, "push_tail() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 3, "there should only be 3 items in the deque");
-	CHECK(dq_peek_head(tau->q) == n2d, "head should be n2");
-	CHECK(dq_peek_tail(tau->q) == n3d, "tail should be n3");
+	CHECK(tau->dq->len == 3);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(adding_items, pshtail_pshhead_pshtail)
 {
-	tau->n1 = dq_push_tail(tau->q, n1d, NULL);
+	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
-	tau->n2 = dq_push_head(tau->q, n2d, NULL);
+	tau->n2 = dq_push_head(tau->dq, n2d, NULL);
 	REQUIRE(tau->n2 != NULL, "push_head() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 2, "there should only be 2 items in the deque");
-	CHECK(dq_peek_head(tau->q) == n2d, "head should be n2");
-	CHECK(dq_peek_tail(tau->q) == n1d, "tail should be n1");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 
-	tau->n3 = dq_push_tail(tau->q, n3d, NULL);
+	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3 != NULL, "push_tail() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 3, "there should only be 3 items in the deque");
-	CHECK(dq_peek_head(tau->q) == n2d, "head should be n2");
-	CHECK(dq_peek_tail(tau->q) == n3d, "tail should be n3");
+	CHECK(tau->dq->len == 3);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(adding_items, pshtail_pshhead_pshhead)
 {
-	tau->n1 = dq_push_tail(tau->q, n1d, NULL);
+	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
-	tau->n2 = dq_push_head(tau->q, n2d, NULL);
+	tau->n2 = dq_push_head(tau->dq, n2d, NULL);
 	REQUIRE(tau->n2 != NULL, "push_head() should return non-null pointer");
-	tau->n3 = dq_push_head(tau->q, n3d, NULL);
+	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3 != NULL, "push_head() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 3, "there should only be 3 items in the deque");
-	CHECK(dq_peek_head(tau->q) == n3d, "head should be n3");
-	CHECK(dq_peek_tail(tau->q) == n1d, "tail should be n1");
+	CHECK(tau->dq->len == 3);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(adding_items, pshtail_pshtail_pshhead)
 {
-	tau->n1 = dq_push_tail(tau->q, n1d, NULL);
+	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
-	tau->n2 = dq_push_tail(tau->q, n2d, NULL);
+	tau->n2 = dq_push_tail(tau->dq, n2d, NULL);
 	REQUIRE(tau->n2 != NULL, "push_tail() should return non-null pointer");
-	tau->n3 = dq_push_head(tau->q, n3d, NULL);
+	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3 != NULL, "push_head() should return non-null pointer");
 
-	CHECK(dq_len(tau->q) == 3, "there should only be 3 items in the deque");
-	CHECK(dq_peek_head(tau->q) == n3d, "head should be n3");
-	CHECK(dq_peek_tail(tau->q) == n2d, "tail should be n2");
+	CHECK(tau->dq->len == 3);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
-/*######################################################################*/
-/*######################################################################*/
+/* ###################################################################### */
+/* ########################## removing_items ############################ */
+/* ###################################################################### */
 
 struct removing_items
 {
-	double_link_node *n1, *n2, *n3;
-	deque *q;
+	linked_node *n1, *n2, *n3;
+	deque *dq;
 };
 
 TEST_F_SETUP(removing_items)
 {
-	tau->q = dq_new();
-	REQUIRE(tau->q, "dq_new() returns non-null");
+	tau->dq = dq_new();
+	REQUIRE(tau->dq, "dq_new() returns non-null");
 }
 
 TEST_F_TEARDOWN(removing_items)
 {
-	free(tau->q);
-	free(tau->n1);
-	free(tau->n2);
-	free(tau->n3);
+	tau->n1 = node_del(tau->n1);
+	tau->n2 = node_del(tau->n2);
+	tau->n3 = node_del(tau->n3);
+	tau->dq->head = NULL;
+	tau->dq->tail = NULL;
+	tau->dq = dq_del(tau->dq, NULL);
 }
 
 TEST(removing_items, poptail_null_should_return_NULL)
 {
-	CHECK(dq_pop_tail(NULL) == NULL, "pointer to deque is required");
+	CHECK(dq_pop_tail(NULL) == NULL);
 }
 
 TEST_F(removing_items, poptail_empty_q_changes_nothing)
 {
-	CHECK(dq_pop_tail(tau->q) == NULL, "nothing should be done");
+	CHECK(dq_pop_tail(tau->dq) == NULL);
 
-	CHECK(dq_len(tau->q) == 0, "deque should have 0 items");
-	CHECK(dq_peek_head(tau->q) == NULL, "head should be unchanged");
-	CHECK(dq_peek_tail(tau->q) == NULL, "tail should be unchanged");
+	CHECK(tau->dq->len == 0);
+	CHECK_PTR_EQ(tau->dq->head, NULL);
+	CHECK_PTR_EQ(tau->dq->tail, NULL);
 }
 
 TEST_F(removing_items, poptail_1_node_from_1)
 {
-	tau->n1 = dq_push_tail(tau->q, n1d, NULL);
+	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
 
-	CHECK_STREQ(
-		(char *)dq_pop_tail(tau->q), n1d, "first node should have been removed"
-	);
+	CHECK_STREQ((char *)dq_pop_tail(tau->dq), n1d);
 	tau->n1 = NULL;
-	CHECK(dq_len(tau->q) == 0, "deque should have 0 items");
-	CHECK(dq_peek_head(tau->q) == NULL, "head should be NULL");
-	CHECK(dq_peek_tail(tau->q) == NULL, "tail should be NULL");
+	CHECK(tau->dq->len == 0);
+	CHECK_PTR_EQ(tau->dq->head, NULL);
+	CHECK_PTR_EQ(tau->dq->tail, NULL);
 }
 
 TEST_F(removing_items, poptail_1_node_from_2)
 {
-	tau->n1 = dq_push_tail(tau->q, n1d, NULL);
+	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
-	tau->n2 = dq_push_tail(tau->q, n2d, NULL);
+	tau->n2 = dq_push_tail(tau->dq, n2d, NULL);
 	REQUIRE(tau->n2 != NULL, "push_tail() should return non-null pointer");
 
-	CHECK_STREQ(
-		(char *)dq_pop_tail(tau->q), n2d, "first node should have been removed"
-	);
+	CHECK_STREQ((char *)dq_pop_tail(tau->dq), n2d);
 	tau->n2 = NULL;
-	CHECK(dq_len(tau->q) == 1, "deque should have 1 item");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be n1");
-	CHECK(dq_peek_tail(tau->q) == n1d, "tail should be unchanged");
+	CHECK(tau->dq->len == 1);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(removing_items, poptail_1_node_from_3)
 {
-	tau->n1 = dq_push_tail(tau->q, n1d, NULL);
+	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
-	tau->n2 = dq_push_tail(tau->q, n2d, NULL);
+	tau->n2 = dq_push_tail(tau->dq, n2d, NULL);
 	REQUIRE(tau->n2 != NULL, "push_tail() should return non-null pointer");
-	tau->n3 = dq_push_tail(tau->q, n3d, NULL);
+	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3 != NULL, "push_tail() should return non-null pointer");
 
-	CHECK_STREQ(
-		(char *)dq_pop_tail(tau->q), n3d, "first node should have been removed"
-	);
+	CHECK_STREQ((char *)dq_pop_tail(tau->dq), n3d);
 	tau->n3 = NULL;
-	CHECK(dq_len(tau->q) == 2, "deque should have 2 items");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be n1");
-	CHECK(dq_peek_tail(tau->q) == n2d, "tail should be unchanged");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
-/*######################################################################*/
-/*######################################################################*/
+/* ###################################################################### */
+/* ##################### add_and_remove_pshtail ######################### */
+/* ###################################################################### */
 
 struct add_and_remove_pshtail
 {
-	double_link_node *n1, *n2, *n3, *n4;
-	deque *q;
+	linked_node *n1, *n2, *n3, *n4;
+	deque *dq;
 };
 
 TEST_F_SETUP(add_and_remove_pshtail)
 {
-	tau->q = dq_new();
-	tau->n1 = dq_push_tail(tau->q, n1d, NULL);
-	tau->n2 = dq_push_tail(tau->q, n2d, NULL);
-	if (!tau->q || !tau->n1 || !tau->n2)
+	tau->dq = dq_new();
+	tau->n1 = dq_push_tail(tau->dq, n1d, NULL);
+	tau->n2 = dq_push_tail(tau->dq, n2d, NULL);
+	if (!tau->dq || !tau->n1 || !tau->n2)
 	{
-		free(tau->n1);
-		free(tau->n2);
-		free(tau->q);
+		tau->n1 = node_del(tau->n1);
+		tau->n2 = node_del(tau->n2);
+		tau->dq->head = NULL;
+		tau->dq->tail = NULL;
+		tau->dq = dq_del(tau->dq, NULL);
 	}
 
-	REQUIRE(tau->q, "dq_new() returns non-null");
+	REQUIRE(tau->dq, "dq_new() returns non-null");
 	REQUIRE(tau->n1, "push_tail() returns non-null");
 	REQUIRE(tau->n2, "push_tail() returns non-null");
 }
 
 TEST_F_TEARDOWN(add_and_remove_pshtail)
 {
-	free(tau->q);
-	free(tau->n1);
-	free(tau->n2);
-	free(tau->n3);
-	free(tau->n4);
+	tau->n1 = node_del(tau->n1);
+	tau->n2 = node_del(tau->n2);
+	tau->n3 = node_del(tau->n3);
+	tau->n4 = node_del(tau->n4);
+	tau->dq->head = NULL;
+	tau->dq->tail = NULL;
+	tau->dq = dq_del(tau->dq, NULL);
 }
 
 TEST_F(add_and_remove_pshtail, pshtail_poptail)
 {
-	tau->n3 = dq_push_tail(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
-	CHECK(dq_pop_tail(tau->q) == n3d, "n3 is removed from tail");
+	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
+	CHECK(dq_pop_tail(tau->dq) == n3d);
 	tau->n3 = NULL;
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be unchanged");
-	CHECK(dq_peek_tail(tau->q) == n2d, "tail should be updated to n2.");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(add_and_remove_pshtail, pshtail_pophead)
 {
-	tau->n3 = dq_push_tail(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
-	CHECK(dq_pop_head(tau->q) == n1d, "n1 is removed from head");
+	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
+	CHECK(dq_pop_head(tau->dq) == n1d);
 	tau->n1 = NULL;
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n2d, "head should be updated to n2");
-	CHECK(dq_peek_tail(tau->q) == n3d, "tail should be updated to n3");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(add_and_remove_pshtail, pshhead_pophead)
 {
-	tau->n3 = dq_push_head(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
-	CHECK(dq_pop_head(tau->q) == n3d, "n3 is removed from head");
+	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
+	CHECK(dq_pop_head(tau->dq) == n3d);
 	tau->n3 = NULL;
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be updated to n1");
-	CHECK(dq_peek_tail(tau->q) == n2d, "tail should be unchanged");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(add_and_remove_pshtail, pshhead_poptail)
 {
-	tau->n3 = dq_push_head(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
-	CHECK(dq_pop_tail(tau->q) == n2d, "n2 is removed from tail");
+	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
+	CHECK(dq_pop_tail(tau->dq) == n2d);
 	tau->n2 = NULL;
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n3d, "head should be updated to n3");
-	CHECK(dq_peek_tail(tau->q) == n1d, "tail should be updated to n1");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(add_and_remove_pshtail, poptail_pushtail)
 {
-	CHECK(dq_pop_tail(tau->q) == n2d, "n2 is removed from the tail");
+	CHECK(dq_pop_tail(tau->dq) == n2d);
 	tau->n2 = NULL;
-	tau->n3 = dq_push_tail(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
+	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be unchanged");
-	CHECK(dq_peek_tail(tau->q) == n3d, "tail should be updated to n3.");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(add_and_remove_pshtail, poptail_pushhead)
 {
-	CHECK(dq_pop_tail(tau->q) == n2d, "n2 is removed from the tail");
+	CHECK(dq_pop_tail(tau->dq) == n2d);
 	tau->n2 = NULL;
-	tau->n3 = dq_push_head(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
+	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n3d, "head should be updated to n3");
-	CHECK(dq_peek_tail(tau->q) == n1d, "tail should be updated to n1.");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(add_and_remove_pshtail, pophead_pushhead)
 {
-	CHECK(dq_pop_head(tau->q) == n1d, "n1 is removed from the tail");
+	CHECK(dq_pop_head(tau->dq) == n1d);
 	tau->n1 = NULL;
-	tau->n3 = dq_push_head(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
+	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n3d, "head should be updated to n3");
-	CHECK(dq_peek_tail(tau->q) == n2d, "tail should be updated to n2.");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(add_and_remove_pshtail, pophead_pushtail)
 {
-	CHECK(dq_pop_head(tau->q) == n1d, "n1 is removed from the tail");
+	CHECK(dq_pop_head(tau->dq) == n1d);
 	tau->n1 = NULL;
-	tau->n3 = dq_push_tail(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
+	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n2d, "head should be updated to n2");
-	CHECK(dq_peek_tail(tau->q) == n3d, "tail should be updated to n3.");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
-/*######################################################################*/
-/*######################################################################*/
+/* ###################################################################### */
+/* ###################### add_and_remove_pshhead ######################## */
+/* ###################################################################### */
 
 struct add_and_remove_pshhead
 {
-	double_link_node *n1, *n2, *n3, *n4;
-	deque *q;
+	linked_node *n1, *n2, *n3, *n4;
+	deque *dq;
 };
 
 TEST_F_SETUP(add_and_remove_pshhead)
 {
-	tau->q = dq_new();
-	tau->n2 = dq_push_head(tau->q, n2d, NULL);
-	tau->n1 = dq_push_head(tau->q, n1d, NULL);
-	if (!tau->q || !tau->n1 || !tau->n2)
+	tau->dq = dq_new();
+	tau->n2 = dq_push_head(tau->dq, n2d, NULL);
+	tau->n1 = dq_push_head(tau->dq, n1d, NULL);
+	if (!tau->dq || !tau->n1 || !tau->n2)
 	{
-		free(tau->n1);
-		free(tau->n2);
-		free(tau->q);
+		tau->n1 = node_del(tau->n1);
+		tau->n2 = node_del(tau->n2);
+		tau->dq->head = NULL;
+		tau->dq->tail = NULL;
+		tau->dq = dq_del(tau->dq, NULL);
 	}
 
-	REQUIRE(tau->q, "dq_new() returns non-null");
+	REQUIRE(tau->dq, "dq_new() returns non-null");
 	REQUIRE(tau->n2, "push_head() returns non-null");
 	REQUIRE(tau->n1, "push_head() returns non-null");
 }
 
 TEST_F_TEARDOWN(add_and_remove_pshhead)
 {
-	free(tau->q);
-	free(tau->n1);
-	free(tau->n2);
-	free(tau->n3);
-	free(tau->n4);
+	tau->n1 = node_del(tau->n1);
+	tau->n2 = node_del(tau->n2);
+	tau->n3 = node_del(tau->n3);
+	tau->n4 = node_del(tau->n4);
+	tau->dq->head = NULL;
+	tau->dq->tail = NULL;
+	tau->dq = dq_del(tau->dq, NULL);
 }
 
 TEST_F(add_and_remove_pshhead, pshtail_poptail)
 {
-	tau->n3 = dq_push_tail(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
-	CHECK(dq_pop_tail(tau->q) == n3d, "n3 is removed from tail");
+	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
+	CHECK(dq_pop_tail(tau->dq) == n3d);
 	tau->n3 = NULL;
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be unchanged");
-	CHECK(dq_peek_tail(tau->q) == n2d, "tail should be updated to n2.");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(add_and_remove_pshhead, pshtail_pophead)
 {
-	tau->n3 = dq_push_tail(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
-	CHECK(dq_pop_head(tau->q) == n1d, "n1 is removed from head");
+	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
+	CHECK(dq_pop_head(tau->dq) == n1d);
 	tau->n1 = NULL;
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n2d, "head should be updated to n2");
-	CHECK(dq_peek_tail(tau->q) == n3d, "tail should be updated to n3");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(add_and_remove_pshhead, pshhead_pophead)
 {
-	tau->n3 = dq_push_head(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
-	CHECK(dq_pop_head(tau->q) == n3d, "n3 is removed from head");
+	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
+	CHECK(dq_pop_head(tau->dq) == n3d);
 	tau->n3 = NULL;
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be updated to n1");
-	CHECK(dq_peek_tail(tau->q) == n2d, "tail should be unchanged");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(add_and_remove_pshhead, pshhead_poptail)
 {
-	tau->n3 = dq_push_head(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
-	CHECK(dq_pop_tail(tau->q) == n2d, "n2 is removed from tail");
+	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
+	CHECK(dq_pop_tail(tau->dq) == n2d);
 	tau->n2 = NULL;
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n3d, "head should be updated to n3");
-	CHECK(dq_peek_tail(tau->q) == n1d, "tail should be updated to n1");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(add_and_remove_pshhead, poptail_pushtail)
 {
-	CHECK(dq_pop_tail(tau->q) == n2d, "n2 is removed from the tail");
+	CHECK(dq_pop_tail(tau->dq) == n2d);
 	tau->n2 = NULL;
-	tau->n3 = dq_push_tail(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
+	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n1d, "head should be unchanged");
-	CHECK(dq_peek_tail(tau->q) == n3d, "tail should be updated to n3.");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(add_and_remove_pshhead, poptail_pushhead)
 {
-	CHECK(dq_pop_tail(tau->q) == n2d, "n2 is removed from the tail");
+	CHECK(dq_pop_tail(tau->dq) == n2d);
 	tau->n2 = NULL;
-	tau->n3 = dq_push_head(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
+	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n3d, "head should be updated to n3");
-	CHECK(dq_peek_tail(tau->q) == n1d, "tail should be updated to n1.");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(add_and_remove_pshhead, pophead_pushhead)
 {
-	CHECK(dq_pop_head(tau->q) == n1d, "n1 is removed from the tail");
+	CHECK(dq_pop_head(tau->dq) == n1d);
 	tau->n1 = NULL;
-	tau->n3 = dq_push_head(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
+	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n3d, "head should be updated to n3");
-	CHECK(dq_peek_tail(tau->q) == n2d, "tail should be updated to n2.");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(add_and_remove_pshhead, pophead_pushtail)
 {
-	CHECK(dq_pop_head(tau->q) == n1d, "n1 is removed from the tail");
+	CHECK(dq_pop_head(tau->dq) == n1d);
 	tau->n1 = NULL;
-	tau->n3 = dq_push_tail(tau->q, n3d, NULL);
-	REQUIRE(tau->n3, "n3 is added");
+	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
+	REQUIRE(tau->n3);
 
-	CHECK(dq_len(tau->q) == 2, "number of items is unchanged");
-	CHECK(dq_peek_head(tau->q) == n2d, "head should be updated to n2");
-	CHECK(dq_peek_tail(tau->q) == n3d, "tail should be updated to n3.");
+	CHECK(tau->dq->len == 2);
+	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
 }
 
-/*######################################################################*/
-/*######################################################################*/
+/* ###################################################################### */
+/* ######################### deleting_deque ############################# */
+/* ###################################################################### */
 
 TEST(deleting_deque, delete_should_clear_all_items)
 {
-	deque *q = dq_new();
-	double_link_node *n1 = dq_push_tail(q, n1d, NULL);
-	double_link_node *n2 = dq_push_tail(q, n2d, NULL);
-	double_link_node *n3 = dq_push_tail(q, n3d, NULL);
+	deque *dq = dq_new();
+	linked_node *n1 = dq_push_tail(dq, n1d, NULL);
+	linked_node *n2 = dq_push_tail(dq, n2d, NULL);
+	linked_node *n3 = dq_push_tail(dq, n3d, NULL);
 
-	if (!q || !n1 || !n2 || !n3)
+	if (!dq || !n1 || !n2 || !n3)
 	{
 		free(n1);
 		free(n2);
 		free(n3);
-		free(q);
+		free(dq);
 	}
 
-	REQUIRE((q && n1 && n2 && n3), "failed to create deque");
+	REQUIRE((dq && n1 && n2 && n3));
 
-	q = dq_delete(q, NULL);
+	dq = dq_del(dq, NULL);
 }
 
 TEST(deleting_deque, delete_f_should_clear_all_items)
 {
-	deque *q = dq_new();
-	double_link_node *n1 = dq_push_tail(q, n1d, dup_str);
-	double_link_node *n2 = dq_push_tail(q, n2d, dup_str);
-	double_link_node *n3 = dq_push_tail(q, n3d, dup_str);
+	deque *dq = dq_new();
+	linked_node *n1 = dq_push_tail(dq, n1d, dup_str);
+	linked_node *n2 = dq_push_tail(dq, n2d, dup_str);
+	linked_node *n3 = dq_push_tail(dq, n3d, dup_str);
 
-	if (!q || !n1 || !n2 || !n3)
+	if (!dq || !n1 || !n2 || !n3)
 	{
-		free(dq_peek_head(q));
+		free(dq->head);
 		free(n1);
-		/*WARNING: data in n2 might not be freed.*/
+		/* WARNING: data in n2 might not be freed. */
 		free(n2);
-		free(dq_peek_tail(q));
+		free(dq->tail);
 		free(n3);
-		free(q);
+		free(dq);
 	}
 
-	REQUIRE((q && n1 && n2 && n3), "failed to create deque");
+	REQUIRE((dq && n1 && n2 && n3));
 
-	q = dq_delete(q, free);
+	dq = dq_del(dq, free);
 }
 
-/*######################################################################*/
-/*######################################################################*/
+/* ###################################################################### */
+/* ############################## dqfa ################################## */
+/* ###################################################################### */
 
 TEST(dqfa, dqfa_invalid_args)
 {
@@ -798,21 +810,21 @@ TEST(dqfa, deque_from_array)
 {
 	long long int arr[] = {1, 2, 3, 4, 5};
 	const size_t arr_len = (sizeof(arr) / sizeof(*arr));
-	deque *q = dq_from_array(arr, arr_len, sizeof(*arr), NULL, NULL);
+	deque *dq = dq_from_array(arr, arr_len, sizeof(*arr), NULL, NULL);
 
-	REQUIRE(q, "dq_from_array() should return non-null pointer");
+	REQUIRE(dq, "dq_from_array() should return non-null pointer");
 
 	CHECK(
-		dq_len(q) == arr_len, "there should be %zu items in the deque", arr_len
+		dq->len == arr_len, "there should be %zu items in the deque", arr_len
 	);
-	CHECK(*(long long int *)dq_pop_tail(q) == arr[4]);
-	CHECK(*(long long int *)dq_pop_tail(q) == arr[3]);
-	CHECK(*(long long int *)dq_pop_tail(q) == arr[2]);
-	CHECK(*(long long int *)dq_pop_tail(q) == arr[1]);
-	CHECK(*(long long int *)dq_pop_tail(q) == arr[0]);
-	CHECK(dq_len(q) == 0, "there should now be 0 items in the deque");
-	CHECK(dq_peek_head(q) == NULL, "head should be NULL");
-	CHECK(dq_peek_tail(q) == NULL, "tail should be NULL");
+	CHECK(*(long long int *)dq_pop_tail(dq) == arr[4]);
+	CHECK(*(long long int *)dq_pop_tail(dq) == arr[3]);
+	CHECK(*(long long int *)dq_pop_tail(dq) == arr[2]);
+	CHECK(*(long long int *)dq_pop_tail(dq) == arr[1]);
+	CHECK(*(long long int *)dq_pop_tail(dq) == arr[0]);
+	CHECK(dq->len == 0);
+	CHECK(dq->head == NULL);
+	CHECK(dq->tail == NULL);
 
-	q = dq_delete(q, NULL);
+	dq = dq_del(dq, NULL);
 }

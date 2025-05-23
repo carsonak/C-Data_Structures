@@ -111,7 +111,7 @@ void ast_print(AST *ptr)
  */
 int main(void)
 {
-	/*4 + 2 * 10 + 3 * (5 + 1)*/
+	/* 4 + 2 * 10 + 3 * (5 + 1) */
 	AST *term = AST_NEW(
 		AST_ADD,
 		AST_NEW(AST_NUMBER, 4),

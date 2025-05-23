@@ -15,7 +15,7 @@ typedef void *(dup_func)(void const *const data);
  * delete_func - a function that deletes an object.
  * @data: pointer to the object to delete.
  */
-typedef void(delete_func)(void *const data);
+typedef void(free_func)(void *const data);
 
 /**
  * print_func - a function that prints an object.
@@ -26,4 +26,4 @@ typedef void(delete_func)(void *const data);
  */
 typedef int(print_func)(FILE *stream, void const *const data);
 
-#endif /*TYPEDEFS_H*/
+#endif /* TYPEDEFS_H */

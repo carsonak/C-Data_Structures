@@ -8,7 +8,9 @@
  *
  * Return: NULL always.
  */
-void *delete_2D_array(void **array, size_t size, delete_func *free_row)
+void *delete_2D_array(
+	void **const restrict array, const size_t size, free_func *free_row
+)
 {
 	if (!array || size < 1)
 		return (NULL);
@@ -37,8 +39,9 @@ void *delete_2D_array(void **array, size_t size, delete_func *free_row)
  * Return: the duplicated array on success, NULL on error.
  */
 void **dup_2D_array(
-	void **const array, const intmax_t size,
-	dup_func *copy_data, delete_func *free_data)
+	void **const restrict array, const intmax_t size, dup_func *copy_data,
+	free_func *free_data
+)
 {
 	intmax_t arr_i = 0;
 	void **array_dup = NULL;
@@ -46,7 +49,7 @@ void **dup_2D_array(
 	if (!array || size < 1)
 		return (NULL);
 
-	array_dup = _calloc(size + 1, sizeof(*array_dup));
+	array_dup = calloc(size + 1, sizeof(*array_dup));
 	if (!array_dup)
 		return (NULL);
 

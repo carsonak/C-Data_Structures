@@ -55,4 +55,4 @@ bool genarr_index_put(
 	Generic_Array const *const ga, const size_t i, void const *const val);
 int genarr_print(Generic_Array const *const ga, FILE *stream);
 
-#endif /*GENERIC_TYPE_H*/
+#endif /* GENERIC_TYPE_H */

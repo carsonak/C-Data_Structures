@@ -1,31 +1,39 @@
-#ifndef DEQUE_H
-#define DEQUE_H
+#ifndef LIST_LIST_TYPE_H
+#define LIST_LIST_TYPE_H
 
-#include <stddef.h> /* size_t */
-#include <stdio.h>  /* *printf */
+#include <assert.h> /* asserts */
+#include <stdint.h> /* intmax_t */
 #include <stdlib.h> /* *alloc */
 
-#include "list_types.h"
+#include "attribute_macros.h"
+#include "list_typedefs.h"
 
-void *delete_2D_array(void **array, size_t size, delete_func *free_row);
+struct deque
+{
+	intmax_t len;
+	linked_node *head;
+	linked_node *tail;
+};
 
-deque *dq_new(void);
-size_t dq_len(deque const *const dq);
-void *dq_peek_head(deque const *const dq);
-void *dq_peek_tail(deque const *const dq);
-double_link_node *
-dq_push_head(deque *const dq, void *const data, dup_func *copy_data);
-void *dq_pop_head(deque *const dq);
-double_link_node *
-dq_push_tail(deque *const dq, void *const data, dup_func *copy_data);
-void *dq_pop_tail(deque *dq);
-void *dq_delete(deque *const nullable_ptr, delete_func *free_data);
+void *dq_del(deque *const dq, free_func *free_data);
+deque *dq_new(void) ATTR_MALLOC ATTR_MALLOC_FREE(dq_del);
+
+linked_node *
+dq_push_head(deque *const restrict dq, void *const data, dup_func *copy_data);
+linked_node *dq_push_tail(
+	deque *const restrict dq, void *const restrict data, dup_func *copy_data
+);
+void *dq_pop_head(deque *const restrict dq);
+void *dq_pop_tail(deque *const restrict dq);
+void dq_clear(deque *const restrict dq, free_func *free_data);
+deque *dq_from_array(
+	void *const restrict data_array, const intmax_t len,
+	const size_t type_size, dup_func *copy_data, free_func *delete_data
+);
+void **
+dq_to_array(const deque *const dq, dup_func *copy_data, free_func *free_data);
 long int dq_print(FILE *stream, deque const *const dq, print_func *print_data);
 long int
 dq_print_reversed(FILE *stream, deque const *const dq, print_func *print_data);
-deque *dq_from_array(
-	void *const data_array, const size_t len, const size_t type_size,
-	dup_func *copy_data, delete_func *delete_data
-);
 
-#endif /* DEQUE_H */
+#endif /* LIST_LIST_TYPE_H */

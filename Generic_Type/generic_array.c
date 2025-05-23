@@ -97,7 +97,7 @@ Generic_Array *genarr_new(
 	switch (type)
 	{
 	case STRING:
-		/*Accounting for '\0'.*/
+		/* Accounting for '\0'. */
 		new_ga = genarr_char_new(data, len + (len ? 1 : 0));
 		if (new_ga && len)
 		{

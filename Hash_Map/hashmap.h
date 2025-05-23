@@ -45,4 +45,4 @@ void *add_bucket_head(Bucket **h, const char *key, const char *val);
 int hashmap_insert(HashMap *ht, const char *key, const char *value);
 void hashmap_print(const HashMap *ht);
 
-#endif /*HASHMAP_H*/
+#endif /* HASHMAP_H */
