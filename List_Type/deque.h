@@ -1,19 +1,12 @@
-#ifndef LIST_LIST_TYPE_H
-#define LIST_LIST_TYPE_H
+#ifndef DEQUE_TYPE_H
+#define DEQUE_TYPE_H
 
 #include <assert.h> /* asserts */
 #include <stdint.h> /* intmax_t */
 #include <stdlib.h> /* *alloc */
 
 #include "attribute_macros.h"
-#include "list_typedefs.h"
-
-struct deque
-{
-	intmax_t len;
-	linked_node *head;
-	linked_node *tail;
-};
+#include "list_type_typedefs.h"
 
 void *dq_del(deque *const dq, free_func *free_data);
 deque *dq_new(void) ATTR_MALLOC ATTR_MALLOC_FREE(dq_del);
@@ -36,4 +29,4 @@ long int dq_print(FILE *stream, deque const *const dq, print_func *print_data);
 long int
 dq_print_reversed(FILE *stream, deque const *const dq, print_func *print_data);
 
-#endif /* LIST_LIST_TYPE_H */
+#endif /* DEQUE_TYPE_H */

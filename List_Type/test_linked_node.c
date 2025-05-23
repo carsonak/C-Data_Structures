@@ -1,8 +1,10 @@
 #define _POSIX_C_SOURCE 200809L
-#include "linked_node.h"
-#include "tau/tau.h"
 #include <stdlib.h>
 #include <string.h>
+
+#include "linked_node.h"
+#include "list_type_structs.h"
+#include "tau/tau.h"
 
 #define MAX_STRING_LENGTH ((unsigned int)256)
 

@@ -1,4 +1,5 @@
 #include "linked_node.h"
+#include "list_type_structs.h"
 
 /**
  * node_get_next - get next node.

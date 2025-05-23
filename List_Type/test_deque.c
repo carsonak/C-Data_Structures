@@ -1,7 +1,9 @@
+#include <stdlib.h> /* free */
+
 #include "deque.h"
 #include "linked_node.h"
+#include "list_type_structs.h"
 #include "tau/tau.h"
-#include <stdlib.h> /* free */
 
 #define MAX_STRING_LENGTH 256U
 

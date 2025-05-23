@@ -1,5 +1,6 @@
 #include "deque.h"
 #include "linked_node.h"
+#include "list_type_structs.h"
 #include "matrix.h"
 
 /**

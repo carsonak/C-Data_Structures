@@ -1,24 +1,11 @@
-#ifndef LIST_LIST_NODE_H
-#define LIST_LIST_NODE_H
+#ifndef LINKED_NODE_TYPE_H
+#define LINKED_NODE_TYPE_H
 
 #include <assert.h> /* asserts */
 #include <stdlib.h> /* *alloc */
 
 #include "attribute_macros.h"
-#include "list_typedefs.h"
-
-/**
- * struct linked_node - a doubly linked node.
- * @next: pointer to the next node.
- * @prev: pointer to the previous node.
- * @data: pointer to the data for the node.
- */
-struct linked_node
-{
-	struct linked_node *restrict next;
-	struct linked_node *restrict prev;
-	void *data;
-};
+#include "list_type_typedefs.h"
 
 linked_node *node_pop(linked_node *const restrict node);
 void *node_del(linked_node *const restrict node);
@@ -64,4 +51,4 @@ long int linked_list_print_reversed(
 	print_func *print_data
 );
 
-#endif /* LIST_LIST_NODE_H */
+#endif /* LINKED_NODE_TYPE_H */

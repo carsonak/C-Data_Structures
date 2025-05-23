@@ -1,5 +1,5 @@
-#ifndef LIST_TYPES_H
-#define LIST_TYPES_H
+#ifndef LIST_TYPE_TYPEDEFS_H
+#define LIST_TYPE_TYPEDEFS_H
 
 #include <stdio.h> /* FILE */
 
@@ -29,4 +29,4 @@ typedef int(print_func)(FILE *stream, void const *const data);
 typedef struct linked_node linked_node;
 typedef struct deque deque;
 
-#endif /* LIST_TYPES_H */
+#endif /* LIST_TYPE_TYPEDEFS_H */

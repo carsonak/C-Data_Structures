@@ -1,5 +1,5 @@
-#ifndef INFIX_PROJ_MACROS_H
-#define INFIX_PROJ_MACROS_H
+#ifndef ATTRIBUTE_MACROS_H
+#define ATTRIBUTE_MACROS_H
 
 #define ATTR_ALLOC_SIZE(...)
 #define ATTR_COUNTED_BY(counter)
@@ -49,4 +49,4 @@
 	#define _GNU_SOURCE
 #endif
 
-#endif /* INFIX_PROJ_MACROS_H */
+#endif /* ATTRIBUTE_MACROS_H */
