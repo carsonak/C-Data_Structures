@@ -1,7 +1,7 @@
 #include <stdlib.h> /* free */
 
 #include "deque.h"
-#include "linked_node.h"
+#include "list_node.h"
 #include "list_type_structs.h"
 #include "tau/tau.h"
 
@@ -89,7 +89,7 @@ TEST(deque_creation, new_returns_empty_q)
 
 struct adding_items
 {
-	linked_node *n1, *n2, *n3;
+	list_node *n1, *n2, *n3;
 	deque *dq;
 };
 
@@ -101,9 +101,9 @@ TEST_F_SETUP(adding_items)
 
 TEST_F_TEARDOWN(adding_items)
 {
-	tau->n1 = node_del(tau->n1);
-	tau->n2 = node_del(tau->n2);
-	tau->n3 = node_del(tau->n3);
+	tau->n1 = lstnode_del(tau->n1);
+	tau->n2 = lstnode_del(tau->n2);
+	tau->n3 = lstnode_del(tau->n3);
 	tau->dq->head = NULL;
 	tau->dq->tail = NULL;
 	tau->dq = dq_del(tau->dq, NULL);
@@ -139,8 +139,8 @@ TEST_F(adding_items, pushtail_q_null_null_adds_node_with_NULL_data)
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
 
 	CHECK(tau->dq->len == 1);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), NULL);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), NULL);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), NULL);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), NULL);
 }
 
 TEST_F(adding_items, pushhead_q_null_null_adds_node_with_NULL_data)
@@ -149,8 +149,8 @@ TEST_F(adding_items, pushhead_q_null_null_adds_node_with_NULL_data)
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
 
 	CHECK(tau->dq->len == 1);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), NULL);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), NULL);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), NULL);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), NULL);
 }
 
 TEST_F(adding_items, pushtail_q_d_f_adds_node_with_duplicated_data)
@@ -159,10 +159,10 @@ TEST_F(adding_items, pushtail_q_d_f_adds_node_with_duplicated_data)
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
 
 	CHECK(tau->dq->len == 1);
-	CHECK_STREQ((char *)node_get_data(tau->dq->head), n1d);
-	CHECK_STREQ((char *)node_get_data(tau->dq->tail), n1d);
+	CHECK_STREQ((char *)lstnode_get_data(tau->dq->head), n1d);
+	CHECK_STREQ((char *)lstnode_get_data(tau->dq->tail), n1d);
 
-	free(node_set_data(tau->dq->head, NULL));
+	free(lstnode_set_data(tau->dq->head, NULL));
 }
 
 TEST_F(adding_items, pushhead_q_d_f_adds_node_with_duplicated_data)
@@ -171,10 +171,10 @@ TEST_F(adding_items, pushhead_q_d_f_adds_node_with_duplicated_data)
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
 
 	CHECK(tau->dq->len == 1);
-	CHECK_STREQ((char *)node_get_data(tau->dq->head), n1d);
-	CHECK_STREQ((char *)node_get_data(tau->dq->tail), n1d);
+	CHECK_STREQ((char *)lstnode_get_data(tau->dq->head), n1d);
+	CHECK_STREQ((char *)lstnode_get_data(tau->dq->tail), n1d);
 
-	free(node_set_data(tau->dq->head, NULL));
+	free(lstnode_set_data(tau->dq->head, NULL));
 }
 
 TEST_F(adding_items, pushtail_3_nodes)
@@ -183,22 +183,22 @@ TEST_F(adding_items, pushtail_3_nodes)
 	REQUIRE(tau->n1 != NULL, "push_tail() should return non-null pointer");
 
 	CHECK(tau->dq->len == 1);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n1d);
 
 	tau->n2 = dq_push_tail(tau->dq, n2d, NULL);
 	REQUIRE(tau->n2 != NULL, "push_tail() should return non-null pointer");
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n2d);
 
 	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3 != NULL, "push_tail() should return non-null pointer");
 
 	CHECK(tau->dq->len == 3);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(adding_items, pushhead_3_nodes)
@@ -207,22 +207,22 @@ TEST_F(adding_items, pushhead_3_nodes)
 	REQUIRE(tau->n1 != NULL, "push_head() should return non-null pointer");
 
 	CHECK(tau->dq->len == 1);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n1d);
 
 	tau->n2 = dq_push_head(tau->dq, n2d, NULL);
 	REQUIRE(tau->n2 != NULL, "push_head() should return non-null pointer");
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n1d);
 
 	tau->n3 = dq_push_head(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3 != NULL, "push_head() should return non-null pointer");
 
 	CHECK(tau->dq->len == 3);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(adding_items, pushtail_q_d_failfunc_returns_NULL)
@@ -251,8 +251,8 @@ TEST_F(adding_items, pushtail_2_nodes_fail_on_2nd)
 
 	CHECK(tau->n2 == NULL, "push_tail() should return NULL on failure");
 	CHECK(tau->dq->len == 1);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(adding_items, pushhead_2_nodes_fail_on_2nd)
@@ -263,8 +263,8 @@ TEST_F(adding_items, pushhead_2_nodes_fail_on_2nd)
 
 	CHECK(tau->n2 == NULL, "push_head() should return NULL on failure");
 	CHECK(tau->dq->len == 1);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(adding_items, pushhead_pushtail_pushtail)
@@ -275,15 +275,15 @@ TEST_F(adding_items, pushhead_pushtail_pushtail)
 	REQUIRE(tau->n2 != NULL, "push_tail() should return non-null pointer");
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n2d);
 
 	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3 != NULL, "push_tail() should return non-null pointer");
 
 	CHECK(tau->dq->len == 3);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(adding_items, pushhead_pushtail_pushhead)
@@ -296,8 +296,8 @@ TEST_F(adding_items, pushhead_pushtail_pushhead)
 	REQUIRE(tau->n3 != NULL, "push_head() should return non-null pointer");
 
 	CHECK(tau->dq->len == 3);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(adding_items, pushhead_pushhead_pushtail)
@@ -310,8 +310,8 @@ TEST_F(adding_items, pushhead_pushhead_pushtail)
 	REQUIRE(tau->n3 != NULL, "push_tail() should return non-null pointer");
 
 	CHECK(tau->dq->len == 3);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(adding_items, pushtail_pushhead_pushtail)
@@ -322,15 +322,15 @@ TEST_F(adding_items, pushtail_pushhead_pushtail)
 	REQUIRE(tau->n2 != NULL, "push_head() should return non-null pointer");
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n1d);
 
 	tau->n3 = dq_push_tail(tau->dq, n3d, NULL);
 	REQUIRE(tau->n3 != NULL, "push_tail() should return non-null pointer");
 
 	CHECK(tau->dq->len == 3);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(adding_items, pushtail_pushhead_pushhead)
@@ -343,8 +343,8 @@ TEST_F(adding_items, pushtail_pushhead_pushhead)
 	REQUIRE(tau->n3 != NULL, "push_head() should return non-null pointer");
 
 	CHECK(tau->dq->len == 3);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(adding_items, pushtail_pushtail_pushhead)
@@ -357,8 +357,8 @@ TEST_F(adding_items, pushtail_pushtail_pushhead)
 	REQUIRE(tau->n3 != NULL, "push_head() should return non-null pointer");
 
 	CHECK(tau->dq->len == 3);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n2d);
 }
 
 /* ###################################################################### */
@@ -367,7 +367,7 @@ TEST_F(adding_items, pushtail_pushtail_pushhead)
 
 struct removing_items
 {
-	linked_node *n1, *n2, *n3;
+	list_node *n1, *n2, *n3;
 	deque *dq;
 };
 
@@ -379,9 +379,9 @@ TEST_F_SETUP(removing_items)
 
 TEST_F_TEARDOWN(removing_items)
 {
-	tau->n1 = node_del(tau->n1);
-	tau->n2 = node_del(tau->n2);
-	tau->n3 = node_del(tau->n3);
+	tau->n1 = lstnode_del(tau->n1);
+	tau->n2 = lstnode_del(tau->n2);
+	tau->n3 = lstnode_del(tau->n3);
 	tau->dq->head = NULL;
 	tau->dq->tail = NULL;
 	tau->dq = dq_del(tau->dq, NULL);
@@ -423,8 +423,8 @@ TEST_F(removing_items, poptail_1_node_from_2)
 	CHECK_STREQ((char *)dq_pop_tail(tau->dq), n2d);
 	tau->n2 = NULL;
 	CHECK(tau->dq->len == 1);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(removing_items, poptail_1_node_from_3)
@@ -439,8 +439,8 @@ TEST_F(removing_items, poptail_1_node_from_3)
 	CHECK_STREQ((char *)dq_pop_tail(tau->dq), n3d);
 	tau->n3 = NULL;
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n2d);
 }
 
 /* ###################################################################### */
@@ -449,7 +449,7 @@ TEST_F(removing_items, poptail_1_node_from_3)
 
 struct add_and_remove_pushtail
 {
-	linked_node *n1, *n2, *n3, *n4;
+	list_node *n1, *n2, *n3, *n4;
 	deque *dq;
 };
 
@@ -460,8 +460,8 @@ TEST_F_SETUP(add_and_remove_pushtail)
 	tau->n2 = dq_push_tail(tau->dq, n2d, NULL);
 	if (!tau->dq || !tau->n1 || !tau->n2)
 	{
-		tau->n1 = node_del(tau->n1);
-		tau->n2 = node_del(tau->n2);
+		tau->n1 = lstnode_del(tau->n1);
+		tau->n2 = lstnode_del(tau->n2);
 		tau->dq->head = NULL;
 		tau->dq->tail = NULL;
 		tau->dq = dq_del(tau->dq, NULL);
@@ -474,10 +474,10 @@ TEST_F_SETUP(add_and_remove_pushtail)
 
 TEST_F_TEARDOWN(add_and_remove_pushtail)
 {
-	tau->n1 = node_del(tau->n1);
-	tau->n2 = node_del(tau->n2);
-	tau->n3 = node_del(tau->n3);
-	tau->n4 = node_del(tau->n4);
+	tau->n1 = lstnode_del(tau->n1);
+	tau->n2 = lstnode_del(tau->n2);
+	tau->n3 = lstnode_del(tau->n3);
+	tau->n4 = lstnode_del(tau->n4);
 	tau->dq->head = NULL;
 	tau->dq->tail = NULL;
 	tau->dq = dq_del(tau->dq, NULL);
@@ -491,8 +491,8 @@ TEST_F(add_and_remove_pushtail, pushtail_poptail)
 	tau->n3 = NULL;
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(add_and_remove_pushtail, pushtail_pophead)
@@ -503,8 +503,8 @@ TEST_F(add_and_remove_pushtail, pushtail_pophead)
 	tau->n1 = NULL;
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(add_and_remove_pushtail, pushhead_pophead)
@@ -515,8 +515,8 @@ TEST_F(add_and_remove_pushtail, pushhead_pophead)
 	tau->n3 = NULL;
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(add_and_remove_pushtail, pushhead_poptail)
@@ -527,8 +527,8 @@ TEST_F(add_and_remove_pushtail, pushhead_poptail)
 	tau->n2 = NULL;
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(add_and_remove_pushtail, poptail_pushtail)
@@ -539,8 +539,8 @@ TEST_F(add_and_remove_pushtail, poptail_pushtail)
 	REQUIRE(tau->n3);
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(add_and_remove_pushtail, poptail_pushhead)
@@ -551,8 +551,8 @@ TEST_F(add_and_remove_pushtail, poptail_pushhead)
 	REQUIRE(tau->n3);
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(add_and_remove_pushtail, pophead_pushhead)
@@ -563,8 +563,8 @@ TEST_F(add_and_remove_pushtail, pophead_pushhead)
 	REQUIRE(tau->n3);
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(add_and_remove_pushtail, pophead_pushtail)
@@ -575,8 +575,8 @@ TEST_F(add_and_remove_pushtail, pophead_pushtail)
 	REQUIRE(tau->n3);
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n3d);
 }
 
 /* ###################################################################### */
@@ -585,7 +585,7 @@ TEST_F(add_and_remove_pushtail, pophead_pushtail)
 
 struct add_and_remove_pushhead
 {
-	linked_node *n1, *n2, *n3, *n4;
+	list_node *n1, *n2, *n3, *n4;
 	deque *dq;
 };
 
@@ -596,8 +596,8 @@ TEST_F_SETUP(add_and_remove_pushhead)
 	tau->n1 = dq_push_head(tau->dq, n1d, NULL);
 	if (!tau->dq || !tau->n1 || !tau->n2)
 	{
-		tau->n1 = node_del(tau->n1);
-		tau->n2 = node_del(tau->n2);
+		tau->n1 = lstnode_del(tau->n1);
+		tau->n2 = lstnode_del(tau->n2);
 		tau->dq->head = NULL;
 		tau->dq->tail = NULL;
 		tau->dq = dq_del(tau->dq, NULL);
@@ -610,10 +610,10 @@ TEST_F_SETUP(add_and_remove_pushhead)
 
 TEST_F_TEARDOWN(add_and_remove_pushhead)
 {
-	tau->n1 = node_del(tau->n1);
-	tau->n2 = node_del(tau->n2);
-	tau->n3 = node_del(tau->n3);
-	tau->n4 = node_del(tau->n4);
+	tau->n1 = lstnode_del(tau->n1);
+	tau->n2 = lstnode_del(tau->n2);
+	tau->n3 = lstnode_del(tau->n3);
+	tau->n4 = lstnode_del(tau->n4);
 	tau->dq->head = NULL;
 	tau->dq->tail = NULL;
 	tau->dq = dq_del(tau->dq, NULL);
@@ -627,8 +627,8 @@ TEST_F(add_and_remove_pushhead, pushtail_poptail)
 	tau->n3 = NULL;
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(add_and_remove_pushhead, pushtail_pophead)
@@ -639,8 +639,8 @@ TEST_F(add_and_remove_pushhead, pushtail_pophead)
 	tau->n1 = NULL;
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(add_and_remove_pushhead, pushhead_pophead)
@@ -651,8 +651,8 @@ TEST_F(add_and_remove_pushhead, pushhead_pophead)
 	tau->n3 = NULL;
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(add_and_remove_pushhead, pushhead_poptail)
@@ -663,8 +663,8 @@ TEST_F(add_and_remove_pushhead, pushhead_poptail)
 	tau->n2 = NULL;
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(add_and_remove_pushhead, poptail_pushtail)
@@ -675,8 +675,8 @@ TEST_F(add_and_remove_pushhead, poptail_pushtail)
 	REQUIRE(tau->n3);
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n1d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n3d);
 }
 
 TEST_F(add_and_remove_pushhead, poptail_pushhead)
@@ -687,8 +687,8 @@ TEST_F(add_and_remove_pushhead, poptail_pushhead)
 	REQUIRE(tau->n3);
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n1d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n1d);
 }
 
 TEST_F(add_and_remove_pushhead, pophead_pushhead)
@@ -699,8 +699,8 @@ TEST_F(add_and_remove_pushhead, pophead_pushhead)
 	REQUIRE(tau->n3);
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n3d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n2d);
 }
 
 TEST_F(add_and_remove_pushhead, pophead_pushtail)
@@ -711,8 +711,8 @@ TEST_F(add_and_remove_pushhead, pophead_pushtail)
 	REQUIRE(tau->n3);
 
 	CHECK(tau->dq->len == 2);
-	CHECK_PTR_EQ(node_get_data(tau->dq->head), n2d);
-	CHECK_PTR_EQ(node_get_data(tau->dq->tail), n3d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->head), n2d);
+	CHECK_PTR_EQ(lstnode_get_data(tau->dq->tail), n3d);
 }
 
 /* ###################################################################### */
@@ -722,17 +722,17 @@ TEST_F(add_and_remove_pushhead, pophead_pushtail)
 TEST(deleting_deque, delete_should_clear_all_items)
 {
 	deque *dq = dq_new();
-	linked_node *n1 = dq_push_tail(dq, n1d, NULL);
-	linked_node *n2 = dq_push_tail(dq, n2d, NULL);
-	linked_node *n3 = dq_push_tail(dq, n3d, NULL);
+	list_node *n1 = dq_push_tail(dq, n1d, NULL);
+	list_node *n2 = dq_push_tail(dq, n2d, NULL);
+	list_node *n3 = dq_push_tail(dq, n3d, NULL);
 
 	if (!dq || !n1 || !n2 || !n3)
 	{
-		node_del(n1);
+		lstnode_del(n1);
 		n1 = NULL;
-		node_del(n2);
+		lstnode_del(n2);
 		n2 = NULL;
-		node_del(n3);
+		lstnode_del(n3);
 		n3 = NULL;
 		dq->head = NULL;
 		dq->tail = NULL;
@@ -747,17 +747,17 @@ TEST(deleting_deque, delete_should_clear_all_items)
 TEST(deleting_deque, delete_f_should_clear_all_items)
 {
 	deque *dq = dq_new();
-	linked_node *n1 = dq_push_tail(dq, n1d, dup_str);
-	linked_node *n2 = dq_push_tail(dq, n2d, dup_str);
-	linked_node *n3 = dq_push_tail(dq, n3d, dup_str);
+	list_node *n1 = dq_push_tail(dq, n1d, dup_str);
+	list_node *n2 = dq_push_tail(dq, n2d, dup_str);
+	list_node *n3 = dq_push_tail(dq, n3d, dup_str);
 
 	if (!dq || !n1 || !n2 || !n3)
 	{
-		free(node_del(n1));
+		free(lstnode_del(n1));
 		n1 = NULL;
-		free(node_del(n2));
+		free(lstnode_del(n2));
 		n2 = NULL;
-		free(node_del(n3));
+		free(lstnode_del(n3));
 		n3 = NULL;
 		dq->head = NULL;
 		dq->tail = NULL;

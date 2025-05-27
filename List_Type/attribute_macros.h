@@ -6,7 +6,8 @@
 #define ATTR_MALLOC
 #define ATTR_MALLOC_FREE(...)
 #define ATTR_NONNULL
-#define ATTR_NONNULL_IDX(...)
+#define ATTR_NONNULL_POS(...)
+#define ATTR_FORMAT(archetype, string_position, va_position)
 
 /* https://gcc.gnu.org/onlinedocs/cpp/_005f_005fhas_005fattribute.html */
 #if defined __has_attribute
@@ -37,10 +38,17 @@
 	#if __has_attribute(nonnull)
 		#undef ATTR_NONNULL
 		#define ATTR_NONNULL __attribute__((nonnull))
-		#undef ATTR_NONNULL_IDX
+		#undef ATTR_NONNULL_POS
 		/* INFO: 1 based indexing. */
-		#define ATTR_NONNULL_IDX(...) __attribute__((nonnull(__VA_ARGS__)))
+		#define ATTR_NONNULL_POS(...) __attribute__((nonnull(__VA_ARGS__)))
 	#endif /* __has_attribute(nonnull) */
+
+	#if __has_attribute(format)
+		#undef ATTR_FORMAT
+		/* INFO: 1 based indexing. */
+		#define ATTR_FORMAT(archetype, string_position, va_position)          \
+			__attribute__((format(archetype, string_position, va_position)))
+	#endif /* __has_attribute(format) */
 
 #endif /* defined __has_attribute */
 

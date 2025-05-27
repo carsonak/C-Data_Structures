@@ -18,12 +18,11 @@ typedef void *(dup_func)(void const *const data);
 typedef void(free_func)(void *const data);
 
 /**
- * print_func - a function that prints an object.
- * @stream: pointer to a stream to print to.
- * @data: the object to print.
+ * data_tostr - a function that stringifies an object.
+ * @data: the object to stringify.
  *
- * Return: number of characters printed, negative number on error.
+ * Return: pointer to the stringified data, NULL error.
  */
-typedef int(print_func)(FILE *stream, void const *const data);
+typedef char *(data_tostr)(void const *const data);
 
 #endif /* TYPEDEFS_H */

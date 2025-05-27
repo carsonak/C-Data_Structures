@@ -3,7 +3,7 @@ include ../Makefile
 MATRIX := ../Matrix
 CFLAGS += -I ../tau -I $(MATRIX)
 
-$(BINDIR)/test_%: test_%.c %.c linked_node.c $(MATRIX)/2d_array.c
+$(BINDIR)/test_%: test_%.c %.c list_node.c $(MATRIX)/2d_array.c
 	@mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) -o $@ $^
 

@@ -4,7 +4,7 @@
 #include <stdlib.h>	  /* free */
 #include <inttypes.h> /* intmax_t */
 
-#include "typedefs.h"
+#include "matrix_typedefs.h"
 
 void *delete_2D_array(
 	void **const restrict array, const size_t size, free_func *free_row

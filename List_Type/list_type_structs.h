@@ -1,5 +1,5 @@
-#ifndef LIST_TYPE_STRUCTS_H
-#define LIST_TYPE_STRUCTS_H
+#ifndef DS_LIST_TYPE_STRUCTS_H
+#define DS_LIST_TYPE_STRUCTS_H
 
 #include <stdint.h> /* intmax_t */
 
@@ -14,21 +14,21 @@
 struct deque
 {
 	intmax_t len;
-	linked_node *head;
-	linked_node *tail;
+	list_node *head;
+	list_node *tail;
 };
 
 /**
- * struct linked_node - a doubly linked node.
+ * struct list_node - a doubly linked node.
  * @next: pointer to the next node.
  * @prev: pointer to the previous node.
  * @data: pointer to the data for the node.
  */
-struct linked_node
+struct list_node
 {
-	struct linked_node *restrict next;
-	struct linked_node *restrict prev;
+	struct list_node *restrict next;
+	struct list_node *restrict prev;
 	void *data;
 };
 
-#endif /* LIST_TYPE_STRUCTS_H */
+#endif /* DS_LIST_TYPE_STRUCTS_H */

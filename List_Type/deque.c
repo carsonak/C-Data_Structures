@@ -1,5 +1,7 @@
+#include <string.h> /* strcpy */
+
 #include "deque.h"
-#include "linked_node.h"
+#include "list_node.h"
 #include "list_type_structs.h"
 #include "matrix.h"
 
@@ -20,17 +22,17 @@ void dq_clear(deque *const restrict dq, free_func *free_data)
 	if (!dq || !dq->head)
 		return;
 
-	linked_node *next_node = node_get_next(dq->head);
+	list_node *next_node = lstnode_get_next(dq->head);
 
 	while (dq->head)
 	{
-		void *d = node_del(dq->head);
+		void *d = lstnode_del(dq->head);
 
 		if (free_data)
 			free_data(d);
 
 		dq->head = next_node;
-		next_node = dq->head ? node_get_next(dq->head) : NULL;
+		next_node = dq->head ? lstnode_get_next(dq->head) : NULL;
 	}
 
 	dq->head = NULL;
@@ -45,7 +47,7 @@ void dq_clear(deque *const restrict dq, free_func *free_data)
  *
  * Return: NULL always.
  */
-void *dq_del(deque *const dq, free_func *free_data)
+void *dq_del(deque *const restrict dq, free_func *free_data)
 {
 	dq_clear(dq, free_data);
 	free(dq);
@@ -60,18 +62,18 @@ void *dq_del(deque *const dq, free_func *free_data)
  *
  * Return: pointer to the new node, NULL on failure.
  */
-linked_node *
+list_node *
 dq_push_head(deque *const restrict dq, void *const data, dup_func *copy_data)
 {
 	if (!dq)
 		return (NULL);
 
-	linked_node *const restrict nw = node_new(data, copy_data);
+	list_node *const restrict nw = lstnode_new(data, copy_data);
 
 	if (!nw)
 		return (NULL);
 
-	dq->head = node_insert_before(dq->head, nw);
+	dq->head = lstnode_insert_before(dq->head, nw);
 	if (!dq->tail)
 		dq->tail = nw;
 
@@ -88,18 +90,18 @@ dq_push_head(deque *const restrict dq, void *const data, dup_func *copy_data)
  *
  * Return: pointer to the newly added node, NULL if dq is NULL or failure.
  */
-linked_node *dq_push_tail(
+list_node *dq_push_tail(
 	deque *const restrict dq, void *const restrict data, dup_func *copy_data
 )
 {
 	if (!dq)
 		return (NULL);
 
-	linked_node *const restrict nw = node_new(data, copy_data);
+	list_node *const restrict nw = lstnode_new(data, copy_data);
 	if (!nw)
 		return (NULL);
 
-	dq->tail = node_insert_after(dq->tail, nw);
+	dq->tail = lstnode_insert_after(dq->tail, nw);
 	if (!dq->head)
 		dq->head = nw;
 
@@ -118,10 +120,10 @@ void *dq_pop_head(deque *const restrict dq)
 	if (!dq || !dq->head)
 		return (NULL);
 
-	linked_node *const node = dq->head;
+	list_node *const node = dq->head;
 
-	dq->head = node_get_next(node);
-	void *const d = node_del(node);
+	dq->head = lstnode_get_next(node);
+	void *const d = lstnode_del(node);
 
 	if (!dq->head)
 		dq->tail = NULL;
@@ -143,10 +145,10 @@ void *dq_pop_tail(deque *const restrict dq)
 	if (!dq || !dq->tail)
 		return (NULL);
 
-	linked_node *node = dq->tail;
+	list_node *node = dq->tail;
 
-	dq->tail = node_get_prev(node);
-	void *const d = node_del(node);
+	dq->tail = lstnode_get_prev(node);
+	void *const d = lstnode_del(node);
 
 	if (!dq->tail)
 		dq->head = NULL;
@@ -210,13 +212,14 @@ deque *dq_from_array(
  *
  * Return: pointer to the data array on success, NULL on failure.
  */
-void **
-dq_to_array(const deque *const dq, dup_func *copy_data, free_func *free_data)
+void **dq_to_array(
+	const deque *const restrict dq, dup_func *copy_data, free_func *free_data
+)
 {
 	if (!dq || !dq->head || dq->len < 1)
 		return (NULL);
 
-	linked_node *node = NULL;
+	list_node *node = NULL;
 	size_t d_i = 0;
 	void **const restrict data_array =
 		calloc(dq->len + 1, sizeof(*data_array));
@@ -224,9 +227,9 @@ dq_to_array(const deque *const dq, dup_func *copy_data, free_func *free_data)
 	if (!data_array)
 		return (NULL);
 
-	for (node = dq->head, d_i = 0; node; node = node_get_next(node), ++d_i)
+	for (node = dq->head, d_i = 0; node; node = lstnode_get_next(node), ++d_i)
 	{
-		void *data = node_get_data(node);
+		void *data = lstnode_get_data(node);
 
 		data_array[d_i] = data;
 		if (copy_data && free_data)
@@ -241,40 +244,51 @@ dq_to_array(const deque *const dq, dup_func *copy_data, free_func *free_data)
 }
 
 /**
- * dq_print - print all nodes of a `deque`.
- * @stream: pointer to the stream to print to.
+ * dq_tostr - stringify a `deque`.
  * @dq: the `deque` to print.
  * @print_data: function that will be called to print data in nodes.
  *
  * Return: number of bytes printed, negative number on error.
  */
-long int dq_print(FILE *stream, deque const *const dq, print_func *print_data)
+char *dq_tostr(deque const *const restrict dq, data_tostr *print_data)
 {
-	if (!stream || !dq)
-		return (-1);
+	if (!dq)
+		return (NULL);
 
 	if (!dq->head)
-		return (fprintf(stream, "(NULL)\n"));
+	{
+		char *const restrict s = malloc(sizeof("(NULL)"));
 
-	return (linked_list_print(stream, dq->head, print_data));
+		if (s)
+			strcpy(s, "(NULL)");
+
+		return (s);
+	}
+
+	return (linked_list_tostr(dq->head, print_data));
 }
 
 /**
- * dq_print_reversed - print all nodes of a `deque` from tail to head.
- * @stream: pointer to the stream to print to.
+ * dq_tostr_reversed - stringify a `deque` from tail to head.
  * @dq: the `deque` to print.
  * @print_data: function that will be called to print data in nodes.
  *
  * Return: number of bytes printed, negative number on error.
  */
-long int
-dq_print_reversed(FILE *stream, deque const *const dq, print_func *print_data)
+char *dq_tostr_reversed(deque const *const restrict dq, data_tostr *print_data)
 {
-	if (!stream || !dq)
-		return (-1);
+	if (!dq)
+		return (NULL);
 
 	if (!dq->tail)
-		return (fprintf(stream, "(NULL)\n"));
+	{
+		char *const restrict s = malloc(sizeof("(NULL)"));
 
-	return (linked_list_print_reversed(stream, dq->tail, print_data));
+		if (s)
+			strcpy(s, "(NULL)");
+
+		return (s);
+	}
+
+	return (linked_list_tostr_reversed(dq->tail, print_data));
 }
